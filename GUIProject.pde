@@ -314,8 +314,6 @@ void controlEvent(ControlEvent theEvent){
     }
   }
   
-  // write the timing hexidecimals to the serial port
-  tc.sendToSerialPort(thePort);
 }
 
 public void input(String theText){
