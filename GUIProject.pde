@@ -122,6 +122,16 @@ void setup() {
   .setSize(80,40)
   .getCaptionLabel().align(ControlP5.CENTER, ControlP5.CENTER),
   
+  cp5.addBang("setTiming")
+  .setPosition(120,890)
+  .setSize(80,40)
+  .getCaptionLabel().align(ControlP5.CENTER, ControlP5.CENTER),
+  
+  cp5.addBang("setAmplitude")
+  .setPosition(220,890)
+  .setSize(80,40)
+  .getCaptionLabel().align(ControlP5.CENTER, ControlP5.CENTER),
+  
   cp5.addBang("Buzzer")
   .setPosition(480,50)
   .setSize(80,40)
@@ -235,7 +245,16 @@ public void startStim() {
   thePort.write(startingStim);
 }
 
-    
+public void setTiming(){
+  println("Setting timing");
+  tc.sendToSerialPort(thePort);
+}
+
+public void setAmplitude(){
+  println("Setting amplitude");
+  amplitudes.sendSettingsToBoard(thePort);
+} 
+ 
 void controlEvent(ControlEvent theEvent){
   
   int intensity;
