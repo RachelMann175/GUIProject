@@ -8,19 +8,12 @@ ControlP5 cp5;
 Serial thePort;
 TimingCommand tc = new TimingCommand();
 AmplitudeSettings amplitudes = new AmplitudeSettings();
+CheckBoxSettings checkBoxSet = new CheckBoxSettings();
 
-List<Textfield> amplitudeInputs;
-List<Textfield> timingInputs;
-List<Label> buttons;
-
-private ArrayList<Integer> channel1StimSinkInfo = new ArrayList<Integer>();
-private ArrayList<Integer> channel1StimSourceInfo = new ArrayList<Integer>();
-private ArrayList<Integer> channel2StimSinkInfo = new ArrayList<Integer>();
-private ArrayList<Integer> channel2StimSourceInfo = new ArrayList<Integer>();
-private ArrayList<Integer> channel1RchrgSinkInfo = new ArrayList<Integer>();
-private ArrayList<Integer> channel1RchrgSourceInfo = new ArrayList<Integer>();
-private ArrayList<Integer> channel2RchrgSinkInfo = new ArrayList<Integer>();
-private ArrayList<Integer> channel2RchrgSourceInfo = new ArrayList<Integer>();
+List<String> amplitudeInputs;
+List<String> timingInputs;
+List<String> buttons;
+List<String> checkBoxes;
 
 void setup() {
   
@@ -29,185 +22,154 @@ void setup() {
   
   cp5 = new ControlP5(this);
   
-    timingInputs = Arrays.asList(
+    timingInputs = Arrays.asList("Stim PW (us)", "Interpulse Delay (us)",
+                                 "Recharge PW (us)", "Pulse Period (ms)");
+                            
     cp5.addTextfield("Stim PW (us)")
     .setPosition(20,50)
     .setSize(200,40)
     .setFont(font)
-    .setAutoClear(false),
+    .setAutoClear(false);
   
     cp5.addTextfield("Interpulse Delay (us)")
     .setPosition(20,120)
     .setSize(200,40)
     .setFont(font)
-    .setAutoClear(false),
+    .setAutoClear(false);
     
     cp5.addTextfield("Recharge PW (us)")
     .setPosition(20,190)
     .setSize(200,40)
     .setFont(font)
-    .setAutoClear(false),
+    .setAutoClear(false);
     
     cp5.addTextfield("Pulse Period (ms)")
     .setPosition(20,260)
     .setSize(200,40)
     .setFont(font)
-    .setAutoClear(false)
-    );
-  
-   amplitudeInputs = Arrays.asList(
-   cp5.addTextfield("Channel 1 Stim: Sink mA")
+    .setAutoClear(false);
+    
+   amplitudeInputs = Arrays.asList("Channel 1 Stim: mA", "Channel 1 Rchrg: mA",
+                                   "Channel 2 Stim: mA", "Channel 2 Rchrg: mA");
+                                   
+   cp5.addTextfield("Channel 1 Stim: mA")
   .setPosition(20,330)
   .setSize(200,40)
   .setFont(font)
-  .setAutoClear(false),
+  .setAutoClear(false);
   
-  cp5.addTextfield("Channel 1 Stim: Source mA")
-  .setPosition(20,400)
-  .setSize(200,40)
-  .setFont(font)
-  .setAutoClear(false),
-  
-  cp5.addTextfield("Channel 1 Rchrg: Sink mA")
+  cp5.addTextfield("Channel 1 Rchrg: mA")
   .setPosition(20,470)
   .setSize(200,40)
   .setFont(font)
-  .setAutoClear(false),
+  .setAutoClear(false);
   
-  cp5.addTextfield("Channel 1 Rchrg: Source mA")
-  .setPosition(20,540)
-  .setSize(200,40)
-  .setFont(font)
-  .setAutoClear(false),
-  
-  cp5.addTextfield("Channel 2 Stim: Source mA")
+  cp5.addTextfield("Channel 2 Stim: mA")
   .setPosition(20,610)
   .setSize(200,40)
   .setFont(font)
-  .setAutoClear(false),
+  .setAutoClear(false);
   
-  cp5.addTextfield("Channel 2 Stim: Sink mA")
-  .setPosition(20,680)
-  .setSize(200,40)
-  .setFont(font)
-  .setAutoClear(false),
-  
-  cp5.addTextfield("Channel 2 Rchrg: Sink mA")
+  cp5.addTextfield("Channel 2 Rchrg: mA")
   .setPosition(20,750)
   .setSize(200,40)
   .setFont(font)
-  .setAutoClear(false),
+  .setAutoClear(false);
   
-  cp5.addTextfield("Channel 2 Rchrg: Source mA")
+  checkBoxes = Arrays.asList("Channel 1 Stim: sink", "Channel 1 Stim: source",
+                             "Channel 1 Rchrg: sink", "Channel 1 Rchrg: source",
+                             "Channel 2 Stim: sink", "Channel 2 Stim: source", 
+                             "Channel 2 Rchrg: sink", "Channel 2 Rchrg: source");
+                             
+  cp5.addCheckBox("Channel 1 Stim: sink")
+  .setPosition(20,400)
+  .setSize(30,40)
+  .addItem("Channel 1 stim sink", 0);
+  
+  cp5.addCheckBox("Channel 1 Stim: source")
+  .setPosition(150,400)
+  .setSize(30,40)
+  .addItem("Channel 1 stim source", 1);
+  
+  cp5.addCheckBox("Channel 1 Rchrg: sink")
+  .setPosition(20,540)
+  .setSize(30,40)
+  .addItem("Channel 1 rchrg sink", 2);
+  
+  cp5.addCheckBox("Channel 1 Rchrg: source")
+  .setPosition(150,540)
+  .setSize(30,40)
+  .addItem("Channel 1 rchrg source", 3);
+  
+  cp5.addCheckBox("Channel 2 Stim: sink")
+  .setPosition(20,680)
+  .setSize(30,40)
+  .addItem("Channel 2 stim sink", 4);
+  
+  cp5.addCheckBox("Channel 2 Stim: source")
+  .setPosition(150,680)
+  .setSize(30,40)
+  .addItem("Channel 2 stim source", 5);
+  
+  cp5.addCheckBox("Channel 2 Rchrg: sink")
   .setPosition(20,820)
-  .setSize(200,40)
-  .setFont(font)
-  .setAutoClear(false)
-  );
+  .setSize(30,40)
+  .addItem("Channel 2 rchrg sink", 6);
   
+  cp5.addCheckBox("Channel 2 Rchrg: source")
+  .setPosition(150,820)
+  .setSize(30,40)
+  .addItem("Channel 2 rchrg source", 7);
   
-  buttons = Arrays.asList(
+  buttons = Arrays.asList("ClearPulseTimings", "ClearAmplitudes", "startStim",
+                          "setTiming", "setAmplitude", "Buzzer", "StopBuzzer",
+                          "GetHistory");
+                          
   cp5.addBang("ClearPulseTimings")
   .setPosition(240,50)
   .setSize(80, 40)
-  .getCaptionLabel().align(ControlP5.CENTER, ControlP5.CENTER),
+  .getCaptionLabel().align(ControlP5.CENTER, ControlP5.CENTER);
   
   cp5.addBang("ClearAmplitudes")
   .setPosition(240,330)
   .setSize(80,40)
-  .getCaptionLabel().align(ControlP5.CENTER, ControlP5.CENTER),
+  .getCaptionLabel().align(ControlP5.CENTER, ControlP5.CENTER);
   
   cp5.addBang("startStim")
   .setPosition(20,890)
   .setSize(80,40)
-  .getCaptionLabel().align(ControlP5.CENTER, ControlP5.CENTER),
+  .getCaptionLabel().align(ControlP5.CENTER, ControlP5.CENTER);
   
   cp5.addBang("setTiming")
   .setPosition(120,890)
   .setSize(80,40)
-  .getCaptionLabel().align(ControlP5.CENTER, ControlP5.CENTER),
+  .getCaptionLabel().align(ControlP5.CENTER, ControlP5.CENTER);
   
   cp5.addBang("setAmplitude")
   .setPosition(220,890)
   .setSize(80,40)
-  .getCaptionLabel().align(ControlP5.CENTER, ControlP5.CENTER),
+  .getCaptionLabel().align(ControlP5.CENTER, ControlP5.CENTER);
   
   cp5.addBang("Buzzer")
   .setPosition(480,50)
   .setSize(80,40)
-  .getCaptionLabel().align(ControlP5.CENTER, ControlP5.CENTER),
+  .getCaptionLabel().align(ControlP5.CENTER, ControlP5.CENTER);
   
   cp5.addBang("StopBuzzer")
   .setPosition(600,50)
   .setSize(80,40)
-  .getCaptionLabel().align(ControlP5.CENTER, ControlP5.CENTER),
+  .getCaptionLabel().align(ControlP5.CENTER, ControlP5.CENTER);
   
-  cp5.addBang("GetStimPWInformation")
-  .setPosition(360,50)
+  cp5.addBang("GetHistory")
+  .setPosition(480,120)
   .setSize(80,40)
-  .getCaptionLabel().align(ControlP5.CENTER, ControlP5.CENTER),
-  
-  cp5.addBang("GetInterpulseDelayInformation")
-  .setPosition(360,120)
-  .setSize(80,40)
-  .getCaptionLabel().align(ControlP5.CENTER, ControlP5.CENTER),
-  
-  cp5.addBang("GetRechargePWInformation")
-  .setPosition(360,190)
-  .setSize(80,40)
-  .getCaptionLabel().align(ControlP5.CENTER, ControlP5.CENTER),
-  
-  cp5.addBang("GetPulsePeriodInformation")
-  .setPosition(360,260)
-  .setSize(80,40)
-  .getCaptionLabel().align(ControlP5.CENTER, ControlP5.CENTER),
-  
-  cp5.addBang("GetChannel1StimSinkInfo")
-  .setPosition(360,330)
-  .setSize(80,40)
-  .getCaptionLabel().align(ControlP5.CENTER, ControlP5.CENTER),
-  
-  cp5.addBang("GetChannel1StimSourceInfo")
-  .setPosition(360,400)
-  .setSize(80,40)
-  .getCaptionLabel().align(ControlP5.CENTER, ControlP5.CENTER),
-  
-  cp5.addBang("GetChannel2StimSinkInfo")
-  .setPosition(360,470)
-  .setSize(80,40)
-  .getCaptionLabel().align(ControlP5.CENTER, ControlP5.CENTER),
-  
-  cp5.addBang("GetChannel2StimSourceInfo")
-  .setPosition(360,540)
-  .setSize(80,40)
-  .getCaptionLabel().align(ControlP5.CENTER, ControlP5.CENTER),
-  
-  cp5.addBang("GetChannel1RchrgSinkInfo")
-  .setPosition(360,610)
-  .setSize(80,40)
-  .getCaptionLabel().align(ControlP5.CENTER, ControlP5.CENTER),
-  
-  cp5.addBang("GetChannel1RchrgSourceInfo")
-  .setPosition(360,680)
-  .setSize(80,40)
-  .getCaptionLabel().align(ControlP5.CENTER, ControlP5.CENTER),
-  
-  cp5.addBang("GetChannel2RchrgSinkInfo")
-  .setPosition(360,750)
-  .setSize(80,40)
-  .getCaptionLabel().align(ControlP5.CENTER, ControlP5.CENTER),
-  
-  cp5.addBang("GetChannel2RchrgSourceInfo")
-  .setPosition(360,820)
-  .setSize(80,40)
-  .getCaptionLabel().align(ControlP5.CENTER, ControlP5.CENTER)
-  );
+  .getCaptionLabel().align(ControlP5.CENTER, ControlP5.CENTER);
   
   textFont(font);
   
   int baudRate = 115200;
-  String portName = Serial.list()[0];
-  thePort = new Serial(this, portName, baudRate);
+  //String portName = Serial.list()[0];
+  //thePort = new Serial(this, portName, baudRate);
   
   background(0);
   fill(255);
@@ -254,56 +216,37 @@ public void setAmplitude(){
   println("Setting amplitude");
   amplitudes.sendSettingsToBoard(thePort);
 } 
+
  
 void controlEvent(ControlEvent theEvent){
   
   int intensity;
   
-  if(amplitudeInputs.contains(theEvent.getController()) || timingInputs.contains(theEvent.getController())){
-    try {
+  if(amplitudeInputs.contains(theEvent.getName()) || timingInputs.contains(theEvent.getName())){
+    try {  
       
       intensity = Integer.parseInt(theEvent.getStringValue());
       
       switch(theEvent.getName()){
     
-        case "Channel 1 Stim: Sink mA":
-          amplitudes.setStimSetting(1, true, intensity);
+        case "Channel 1 Stim: mA":
+          amplitudes.setStimSetting(1, checkBoxSet.getStimSet1(), intensity);
           channel1StimSinkInfo.add(intensity);
           break;
     
-        case "Channel 1 Stim: Source mA":
-          amplitudes.setStimSetting(1, false, intensity);
-          channel1StimSourceInfo.add(intensity);
-          break;
-    
         case "Channel 2 Stim: Sink mA":
-          amplitudes.setStimSetting(2, true, intensity);
+          amplitudes.setStimSetting(2, checkBoxSet.getStimSet2(), intensity);
           channel2StimSinkInfo.add(intensity);
           break;
-    
-        case "Channel 2 Stim: Source mA":
-          amplitudes.setStimSetting(2, false, intensity);
-          channel2StimSourceInfo.add(intensity);
-          break;
       
-        case "Channel 1 Rchrg: Sink mA":
-          amplitudes.setRchrgSetting(1, true, intensity);
+        case "Channel 1 Rchrg: mA":
+          amplitudes.setRchrgSetting(1, checkBoxSet.getRchrgSet1(), intensity);
           channel1RchrgSinkInfo.add(intensity);
           break;
-    
-        case "Channel 1 Rchrg: Source mA":
-          amplitudes.setRchrgSetting(1, false, intensity);
-          channel1RchrgSourceInfo.add(intensity);
-          break;
       
-        case "Channel 2 Rchrg: Sink mA":
-          amplitudes.setRchrgSetting(2, true, intensity);
+        case "Channel 2 Rchrg: mA":
+          amplitudes.setRchrgSetting(2, checkBoxSet.getRchrgSet2(), intensity);
           channel2RchrgSinkInfo.add(intensity);
-          break;
-    
-        case "Channel 2 Rchrg: Source mA":
-          amplitudes.setRchrgSetting(2, false, intensity);
-          channel2RchrgSourceInfo.add(intensity);
           break;
   
         // if user is setting stimulus pulse width, store the input as a byte
@@ -326,21 +269,13 @@ void controlEvent(ControlEvent theEvent){
           tc.setPulsePeriod(Integer.parseInt(theEvent.getStringValue()));
           break;
       }
+    
       
       
     } catch (NumberFormatException e) {
       println("Error: Must enter valid integer input!");
     }
   }
-  
-  // write the timing hexidecimals to the serial port
-  tc.sendToSerialPort(thePort);
-}
-
-public void input(String theText){
-  // automatically receives results from controller input
-  println("a textfield event for controller 'input' : " + theText);
-  
 }
 
 
