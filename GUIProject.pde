@@ -9,6 +9,7 @@ Serial thePort;
 TimingCommand tc = new TimingCommand();
 AmplitudeSettings amplitudes = new AmplitudeSettings();
 CheckBoxSettings checkBoxSet = new CheckBoxSettings();
+DataLogging dl = new DataLogging();
 
 List<String> amplitudeInputs;
 List<String> timingInputs;
@@ -168,8 +169,8 @@ void setup() {
   textFont(font);
   
   int baudRate = 115200;
-  //String portName = Serial.list()[0];
-  //thePort = new Serial(this, portName, baudRate);
+  String portName = Serial.list()[0];
+  thePort = new Serial(this, portName, baudRate);
   
   background(0);
   fill(255);
@@ -200,10 +201,10 @@ public void startStim() {
  
   // a byte array to store the hexidecimals that will be start the stimulation
   byte[] startingStim;
-  startingStim = new byte[] { (byte) 0x00, (byte) 0x80, (byte) 0x0B, (byte) 0x01, 
-                  (byte) 0x03, (byte) 0x00, (byte) 0xC0 };
+  startingStim = new byte[] { 0x00, (byte) 0x80, 0x0B, 0x01, 
+                  0x03, 0x00, (byte) 0xC0 };
   
-  println("Starting Stim : " + startingStim);
+  println("Starting Stim");
   thePort.write(startingStim);
 }
 
@@ -216,6 +217,10 @@ public void setAmplitude(){
   println("Setting amplitude");
   amplitudes.sendSettingsToBoard(thePort);
 } 
+
+public void GetHistory(){
+  dl.GetHistory();
+}
 
  
 void controlEvent(ControlEvent theEvent){
@@ -231,22 +236,18 @@ void controlEvent(ControlEvent theEvent){
     
         case "Channel 1 Stim: mA":
           amplitudes.setStimSetting(1, checkBoxSet.getStimSet1(), intensity);
-          channel1StimSinkInfo.add(intensity);
           break;
     
         case "Channel 2 Stim: Sink mA":
           amplitudes.setStimSetting(2, checkBoxSet.getStimSet2(), intensity);
-          channel2StimSinkInfo.add(intensity);
           break;
       
         case "Channel 1 Rchrg: mA":
           amplitudes.setRchrgSetting(1, checkBoxSet.getRchrgSet1(), intensity);
-          channel1RchrgSinkInfo.add(intensity);
           break;
       
         case "Channel 2 Rchrg: mA":
           amplitudes.setRchrgSetting(2, checkBoxSet.getRchrgSet2(), intensity);
-          channel2RchrgSinkInfo.add(intensity);
           break;
   
         // if user is setting stimulus pulse width, store the input as a byte
@@ -277,7 +278,6 @@ void controlEvent(ControlEvent theEvent){
     }
   }
 }
-
 
 
 
