@@ -2,6 +2,7 @@ import controlP5.*;
 import processing.serial.*;
 import java.util.List;
 import java.util.Arrays;
+import java.io.File;
 
 String textValue = "";
 ControlP5 cp5;
@@ -15,6 +16,17 @@ List<String> timingInputs;
 List<String> buttons;
 List<String> checkBoxes;
 
+Table table = new Table();
+
+String filename;
+int storedFiles;
+int day = day();
+int month = month();
+int year = year();
+int hour = hour();
+int min = minute();
+int s = second();
+
 void setup() {
   
   size(700,1600);
@@ -22,37 +34,41 @@ void setup() {
   
   cp5 = new ControlP5(this);
   
-    timingInputs = Arrays.asList("Stim PW (us)", "Interpulse Delay (us)",
+  table.addColumn("Data");
+  table.addColumn("Time");
+  table.addColumn("Date");
+  
+  timingInputs = Arrays.asList("Stim PW (us)", "Interpulse Delay (us)",
                                  "Recharge PW (us)", "Pulse Period (ms)");
                             
-    cp5.addTextfield("Stim PW (us)")
-    .setPosition(20,50)
-    .setSize(200,40)
-    .setFont(font)
-    .setAutoClear(false);
+  cp5.addTextfield("Stim PW (us)")
+  .setPosition(20,50)
+  .setSize(200,40)
+  .setFont(font)
+  .setAutoClear(false);
   
-    cp5.addTextfield("Interpulse Delay (us)")
-    .setPosition(20,120)
-    .setSize(200,40)
-    .setFont(font)
-    .setAutoClear(false);
+  cp5.addTextfield("Interpulse Delay (us)")
+  .setPosition(20,120)
+  .setSize(200,40)
+  .setFont(font)
+  .setAutoClear(false);
     
-    cp5.addTextfield("Recharge PW (us)")
-    .setPosition(20,190)
-    .setSize(200,40)
-    .setFont(font)
-    .setAutoClear(false);
+  cp5.addTextfield("Recharge PW (us)")
+  .setPosition(20,190)
+  .setSize(200,40)
+  .setFont(font)
+  .setAutoClear(false);
     
-    cp5.addTextfield("Pulse Period (ms)")
-    .setPosition(20,260)
-    .setSize(200,40)
-    .setFont(font)
-    .setAutoClear(false);
+  cp5.addTextfield("Pulse Period (ms)")
+  .setPosition(20,260)
+  .setSize(200,40)
+  .setFont(font)
+  .setAutoClear(false);
     
-   amplitudeInputs = Arrays.asList("Channel 1 Stim: mA", "Channel 1 Rchrg: mA",
+  amplitudeInputs = Arrays.asList("Channel 1 Stim: mA", "Channel 1 Rchrg: mA",
                                    "Channel 2 Stim: mA", "Channel 2 Rchrg: mA");
                                    
-   cp5.addTextfield("Channel 1 Stim: mA")
+  cp5.addTextfield("Channel 1 Stim: mA")
   .setPosition(20,330)
   .setSize(200,40)
   .setFont(font)
@@ -123,7 +139,7 @@ void setup() {
   
   buttons = Arrays.asList("ClearPulseTimings", "ClearAmplitudes", "startStim",
                           "setTiming", "setAmplitude", "Buzzer", "StopBuzzer",
-                          "GetHistory");
+                          "GetHistory", "ClearHistory");
                           
   cp5.addBang("ClearPulseTimings")
   .setPosition(240,50)
@@ -165,11 +181,16 @@ void setup() {
   .setSize(80,40)
   .getCaptionLabel().align(ControlP5.CENTER, ControlP5.CENTER);
   
+  cp5.addBang("ClearHistory")
+  .setPosition(600,120)
+  .setSize(80,40)
+  .getCaptionLabel().align(ControlP5.CENTER, ControlP5.CENTER);
+  
   textFont(font);
   
   int baudRate = 115200;
-  //String portName = Serial.list()[0];
-  //thePort = new Serial(this, portName, baudRate);
+  String portName = Serial.list()[0];
+  thePort = new Serial(this, portName, baudRate);
   
   background(0);
   fill(255);
@@ -200,11 +221,24 @@ public void startStim() {
  
   // a byte array to store the hexidecimals that will be start the stimulation
   byte[] startingStim;
-  startingStim = new byte[] { (byte) 0x00, (byte) 0x80, (byte) 0x0B, (byte) 0x01, 
-                  (byte) 0x03, (byte) 0x00, (byte) 0xC0 };
+  startingStim = new byte[] { 0x00, (byte) 0x80, 0x0B, 0x01, 
+                  0x03, 0x00, (byte) 0xC0 };
   
-  println("Starting Stim : " + startingStim);
+  println("Starting Stim");
   thePort.write(startingStim);
+  
+  byte[] framReadByte = new byte[]{0x00, (byte) 0x80, 0x09, 0x03, 
+                        (byte) 0xFF, (byte) 0xC0};
+  thePort.write(framReadByte);
+  if(thePort.available() > 0) {
+    storedFiles = thePort.read();
+    if(storedFiles != -1){
+      TableRow row = table.addRow();
+      row.setInt("Data", storedFiles);
+      row.setString("Time", str(hour) + ":" + str(min) + ":" + str(s));
+      row.setString("Date", str(month) + "/" + str(day) + "/" + str(year));
+    }
+  }
 }
 
 public void setTiming(){
@@ -217,10 +251,87 @@ public void setAmplitude(){
   amplitudes.sendSettingsToBoard(thePort);
 } 
 
+public void GetHistory(){
+  println("retreiving files");
+  filename =  str(month) + "-" + str(day) + "--" + str(hour) 
+             + "-" + str(min) + "-" + str(s) + ".tsv";
+  saveTable(table, "data/" + filename);
+  for(TableRow row : table.rows()){
+    int data = row.getInt("Data");
+    String time = row.getString("Time");
+    String date = row.getString("Date");
+    println("Data : " + data + ", Date : " + date + ", Time : " + time);
+  }
+}
+
+public void ClearHistory(){
+
+  File f = new File(dataPath(filename));
+  println(dataPath(filename));
+  if(f.exists()){
+    f.delete();
+    println("Files have been cleared");
+  }
+  else{
+    println("File could not be found");
+  }
+}
+
+public void ClearPulseTimings() {
+  cp5.get(Textfield.class,"Stim PW (us)").clear();
+  cp5.get(Textfield.class,"Interpulse Delay (us)").clear();
+  cp5.get(Textfield.class,"Recharge PW (us)").clear();
+  cp5.get(Textfield.class,"Pulse Period (ms)").clear();
+}
+
+public void ClearAmplitudes() {
+  cp5.get(Textfield.class,"Channel 1 Stim: Sink mA").clear();
+  cp5.get(Textfield.class,"Channel 2 Stim: Source mA").clear();
+  cp5.get(Textfield.class,"Channel 1 Rchrg: Source mA").clear();
+  cp5.get(Textfield.class,"Channel 2 Rchrg: Sink mA").clear();
+}
+
  
 void controlEvent(ControlEvent theEvent){
   
   int intensity;
+  
+  if(checkBoxes.contains(theEvent.getName())){
+
+        switch(theEvent.getName()){
+          case "Channel 1 Stim: sink":
+            checkBoxSet.setStimSet1(true);
+            break;
+        
+          case "Channel 1 Stim: source":
+            checkBoxSet.setStimSet1(false);
+            break;
+        
+          case "Channel 2 Stim: sink":
+            checkBoxSet.setStimSet2(true);
+            break;
+        
+          case "Channel 2 Stim: source":
+            checkBoxSet.setStimSet2(false);
+            break;
+      
+          case "Channel 1 Rchrg: sink":
+            checkBoxSet.setRchrgSet1(true);
+            break;
+        
+          case "Channel 1 Rchrg: source":
+            checkBoxSet.setRchrgSet1(false);
+            break;
+        
+          case "Channel 2 Rchrg: sink":
+            checkBoxSet.setRchrgSet2(true);
+            break;
+        
+          case "Channel 2 Rchrg: source":
+            checkBoxSet.setRchrgSet2(false);
+            break;
+        }
+      }
   
   if(amplitudeInputs.contains(theEvent.getName()) || timingInputs.contains(theEvent.getName())){
     try {  
@@ -231,22 +342,18 @@ void controlEvent(ControlEvent theEvent){
     
         case "Channel 1 Stim: mA":
           amplitudes.setStimSetting(1, checkBoxSet.getStimSet1(), intensity);
-          channel1StimSinkInfo.add(intensity);
           break;
     
-        case "Channel 2 Stim: Sink mA":
+        case "Channel 2 Stim: mA":
           amplitudes.setStimSetting(2, checkBoxSet.getStimSet2(), intensity);
-          channel2StimSinkInfo.add(intensity);
           break;
       
         case "Channel 1 Rchrg: mA":
           amplitudes.setRchrgSetting(1, checkBoxSet.getRchrgSet1(), intensity);
-          channel1RchrgSinkInfo.add(intensity);
           break;
       
         case "Channel 2 Rchrg: mA":
           amplitudes.setRchrgSetting(2, checkBoxSet.getRchrgSet2(), intensity);
-          channel2RchrgSinkInfo.add(intensity);
           break;
   
         // if user is setting stimulus pulse width, store the input as a byte
