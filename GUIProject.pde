@@ -3,6 +3,7 @@ import processing.serial.*;
 import java.util.List;
 import java.util.Arrays;
 import java.io.File;
+import java.nio.file.*;
 
 String textValue = "";
 ControlP5 cp5;
@@ -64,7 +65,6 @@ void setup() {
   .setSize(200,40)
   .setFont(font)
   .setAutoClear(false);
-    
   amplitudeInputs = Arrays.asList("Channel 1 Stim: mA", "Channel 1 Rchrg: mA",
                                    "Channel 2 Stim: mA", "Channel 2 Rchrg: mA");
                                    
@@ -214,6 +214,7 @@ public void StopBuzzer(){
   
   byte[] stopBuzz = { (byte) 0x00, (byte) 0x80, (byte) 0x05, (byte) 0x01, 
                       (byte) 0x00, (byte) 0x00, (byte) 0xC0};
+  println("Stopped buzzing");
   thePort.write(stopBuzz);
 }
 
@@ -230,15 +231,15 @@ public void startStim() {
   byte[] framReadByte = new byte[]{0x00, (byte) 0x80, 0x09, 0x03, 
                         (byte) 0xFF, (byte) 0xC0};
   thePort.write(framReadByte);
-  if(thePort.available() > 0) {
+  //if(thePort.available() > 0) {
     storedFiles = thePort.read();
-    if(storedFiles != -1){
+    //if(storedFiles != -1){
       TableRow row = table.addRow();
       row.setInt("Data", storedFiles);
       row.setString("Time", str(hour) + ":" + str(min) + ":" + str(s));
       row.setString("Date", str(month) + "/" + str(day) + "/" + str(year));
-    }
-  }
+    //}
+  //}
 }
 
 public void setTiming(){
@@ -266,15 +267,16 @@ public void GetHistory(){
 
 public void ClearHistory(){
 
-  File f = new File(dataPath(filename));
-  println(dataPath(filename));
-  if(f.exists()){
-    f.delete();
-    println("Files have been cleared");
+  try{
+    Files.deleteIfExists(Paths.get(dataPath(filename)));
   }
-  else{
-    println("File could not be found");
+  catch(NoSuchFileException e){
+    println("History is already cleared");
   }
+  catch(IOException e){
+    println(e);
+  }
+  println("History cleared");
 }
 
 public void ClearPulseTimings() {
