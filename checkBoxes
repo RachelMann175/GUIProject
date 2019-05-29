@@ -5,46 +5,6 @@ class CheckBoxSettings{
   private boolean rchrgSet1;
   private boolean rchrgSet2;
   
-  void controlEvent(ControlEvent theEvent){
-    
-    if(checkBoxes.contains(theEvent.getName())){
-        switch(theEvent.getName()){
-          case "Channel 1 Stim: Sink":
-            stimSet1 = true;
-            break;
-        
-          case "Channel 1 Stim: Source":
-            stimSet1 = false;
-            break;
-        
-          case "Channel 2 Stim: Sink":
-            stimSet2 = true;
-            break;
-        
-          case "Channel 2 Stim: Source":
-            stimSet2 = false;
-            break;
-      
-          case "Channel 1 Rchrg: Sink":
-            rchrgSet1 = true;
-            break;
-        
-          case "Channel 1 Rchrg: Source":
-            rchrgSet1 = false;
-            break;
-        
-          case "Channel 2 Rchrg: Sink":
-            rchrgSet2 = true;
-            break;
-        
-          case "Channel 2 Rchrg: Source":
-            rchrgSet2 = false;
-            break;
-        }
-      }
-    }
-  
-  
   public boolean getStimSet1(){
     return stimSet1;
   }
@@ -60,4 +20,21 @@ class CheckBoxSettings{
   public boolean getRchrgSet2(){
     return rchrgSet2;
   }
+  
+  public void setStimSet1(boolean stimSet1){
+    this.stimSet1 = stimSet1;
+  }
+  
+  public void setStimSet2(boolean stimSet2){
+    this.stimSet2 = stimSet2;
+  }
+  
+  public void setRchrgSet1(boolean rchrgSet1){
+    this.rchrgSet1 = rchrgSet1;
+  }
+  
+  public void setRchrgSet2(boolean rchrgSet2){
+    this.rchrgSet2 = rchrgSet2;
+  }
+  
 }
