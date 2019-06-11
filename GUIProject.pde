@@ -2,8 +2,6 @@ import controlP5.*;
 import processing.serial.*;
 import java.util.List;
 import java.util.Arrays;
-import java.io.File;
-import java.nio.file.*;
 
 String textValue = "";
 ControlP5 cp5;
@@ -20,7 +18,7 @@ List<String> checkBoxes;
 Table table = new Table();
 
 String filename;
-int storedFiles;
+String storedFiles;
 int day = day();
 int month = month();
 int year = year();
@@ -65,6 +63,7 @@ void setup() {
   .setSize(200,40)
   .setFont(font)
   .setAutoClear(false);
+    
   amplitudeInputs = Arrays.asList("Channel 1 Stim: mA", "Channel 1 Rchrg: mA",
                                    "Channel 2 Stim: mA", "Channel 2 Rchrg: mA");
                                    
@@ -139,7 +138,7 @@ void setup() {
   
   buttons = Arrays.asList("ClearPulseTimings", "ClearAmplitudes", "startStim",
                           "setTiming", "setAmplitude", "Buzzer", "StopBuzzer",
-                          "GetHistory", "ClearHistory");
+                          "GetHistory");
                           
   cp5.addBang("ClearPulseTimings")
   .setPosition(240,50)
@@ -181,16 +180,11 @@ void setup() {
   .setSize(80,40)
   .getCaptionLabel().align(ControlP5.CENTER, ControlP5.CENTER);
   
-  cp5.addBang("ClearHistory")
-  .setPosition(600,120)
-  .setSize(80,40)
-  .getCaptionLabel().align(ControlP5.CENTER, ControlP5.CENTER);
-  
   textFont(font);
   
   int baudRate = 115200;
-  String portName = Serial.list()[0];
-  thePort = new Serial(this, portName, baudRate);
+  //String portName = Serial.list()[0];
+  //thePort = new Serial(this, portName, baudRate);
   
   background(0);
   fill(255);
@@ -214,7 +208,6 @@ public void StopBuzzer(){
   
   byte[] stopBuzz = { (byte) 0x00, (byte) 0x80, (byte) 0x05, (byte) 0x01, 
                       (byte) 0x00, (byte) 0x00, (byte) 0xC0};
-  println("Stopped buzzing");
   thePort.write(stopBuzz);
 }
 
@@ -228,18 +221,17 @@ public void startStim() {
   println("Starting Stim");
   thePort.write(startingStim);
   
-  byte[] framReadByte = new byte[]{0x00, (byte) 0x80, 0x09, 0x03, 
-                        (byte) 0xFF, (byte) 0xC0};
+  byte[] framReadByte = new byte[]{0x00, (byte) 0x80, 0x09, 0x03, (byte) 0xFF, (byte) 0xC0};
   thePort.write(framReadByte);
-  //if(thePort.available() > 0) {
-    storedFiles = thePort.read();
-    //if(storedFiles != -1){
+  if(thePort.available() > 0) {
+    storedFiles = thePort.readString();
+    if(storedFiles != null){
       TableRow row = table.addRow();
-      row.setInt("Data", storedFiles);
+      row.setString("Data", storedFiles);
       row.setString("Time", str(hour) + ":" + str(min) + ":" + str(s));
       row.setString("Date", str(month) + "/" + str(day) + "/" + str(year));
-    //}
-  //}
+    }
+  }
 }
 
 public void setTiming(){
@@ -253,30 +245,9 @@ public void setAmplitude(){
 } 
 
 public void GetHistory(){
-  println("retreiving files");
-  filename =  str(month) + "-" + str(day) + "--" + str(hour) 
-             + "-" + str(min) + "-" + str(s) + ".tsv";
-  saveTable(table, "data/" + filename);
-  for(TableRow row : table.rows()){
-    int data = row.getInt("Data");
-    String time = row.getString("Time");
-    String date = row.getString("Date");
-    println("Data : " + data + ", Date : " + date + ", Time : " + time);
-  }
-}
-
-public void ClearHistory(){
-
-  try{
-    Files.deleteIfExists(Paths.get(dataPath(filename)));
-  }
-  catch(NoSuchFileException e){
-    println("History is already cleared");
-  }
-  catch(IOException e){
-    println(e);
-  }
-  println("History cleared");
+  filename = "data/" + str(day) + "-" + str(month) + "--" + str(hour) 
+             + "-" + str(min) + "-" + str(s) + ".csv";
+  saveTable(table, filename);
 }
 
 public void ClearPulseTimings() {
@@ -298,43 +269,6 @@ void controlEvent(ControlEvent theEvent){
   
   int intensity;
   
-  if(checkBoxes.contains(theEvent.getName())){
-
-        switch(theEvent.getName()){
-          case "Channel 1 Stim: sink":
-            checkBoxSet.setStimSet1(true);
-            break;
-        
-          case "Channel 1 Stim: source":
-            checkBoxSet.setStimSet1(false);
-            break;
-        
-          case "Channel 2 Stim: sink":
-            checkBoxSet.setStimSet2(true);
-            break;
-        
-          case "Channel 2 Stim: source":
-            checkBoxSet.setStimSet2(false);
-            break;
-      
-          case "Channel 1 Rchrg: sink":
-            checkBoxSet.setRchrgSet1(true);
-            break;
-        
-          case "Channel 1 Rchrg: source":
-            checkBoxSet.setRchrgSet1(false);
-            break;
-        
-          case "Channel 2 Rchrg: sink":
-            checkBoxSet.setRchrgSet2(true);
-            break;
-        
-          case "Channel 2 Rchrg: source":
-            checkBoxSet.setRchrgSet2(false);
-            break;
-        }
-      }
-  
   if(amplitudeInputs.contains(theEvent.getName()) || timingInputs.contains(theEvent.getName())){
     try {  
       
@@ -346,7 +280,7 @@ void controlEvent(ControlEvent theEvent){
           amplitudes.setStimSetting(1, checkBoxSet.getStimSet1(), intensity);
           break;
     
-        case "Channel 2 Stim: mA":
+        case "Channel 2 Stim: Sink mA":
           amplitudes.setStimSetting(2, checkBoxSet.getStimSet2(), intensity);
           break;
       
@@ -386,7 +320,6 @@ void controlEvent(ControlEvent theEvent){
     }
   }
 }
-
 
 
 
