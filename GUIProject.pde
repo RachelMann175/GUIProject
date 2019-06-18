@@ -8,12 +8,16 @@ ControlP5 cp5;
 Serial thePort;
 TimingCommand tc = new TimingCommand();
 AmplitudeSettings amplitudes = new AmplitudeSettings();
-CheckBoxSettings checkBoxSet = new CheckBoxSettings();
 
 List<String> amplitudeInputs;
 List<String> timingInputs;
 List<String> buttons;
 List<String> checkBoxes;
+
+private boolean stimSet1;
+private boolean stimSet2;
+private boolean rchrgSet1;
+private boolean rchrgSet2;
 
 Table table = new Table();
 
@@ -43,7 +47,6 @@ void setup() {
   cp5.addTextfield("Stim PW (us)")
   .setPosition(20,50)
   .setSize(200,40)
-  .setFont(font)
   .setAutoClear(false);
   
   cp5.addTextfield("Interpulse Delay (us)")
@@ -277,46 +280,79 @@ void controlEvent(ControlEvent theEvent){
       switch(theEvent.getName()){
     
         case "Channel 1 Stim: mA":
-          amplitudes.setStimSetting(1, checkBoxSet.getStimSet1(), intensity);
+          amplitudes.setStimSetting(1, stimSet1, intensity);
           break;
     
-        case "Channel 2 Stim: Sink mA":
-          amplitudes.setStimSetting(2, checkBoxSet.getStimSet2(), intensity);
+        case "Channel 2 Stim: mA":
+          amplitudes.setStimSetting(2, stimSet2, intensity);
           break;
       
         case "Channel 1 Rchrg: mA":
-          amplitudes.setRchrgSetting(1, checkBoxSet.getRchrgSet1(), intensity);
+          amplitudes.setRchrgSetting(1, rchrgSet1, intensity);
           break;
       
         case "Channel 2 Rchrg: mA":
-          amplitudes.setRchrgSetting(2, checkBoxSet.getRchrgSet2(), intensity);
+          amplitudes.setRchrgSetting(2, rchrgSet2, intensity);
           break;
   
         // if user is setting stimulus pulse width, store the input as a byte
         case "Stim PW (us)":
-          tc.setStimPulseWidth(Integer.parseInt(theEvent.getStringValue()));
+          tc.setStimPulseWidth(intensity);
           break;
   
         // if user is setting interpulse delay, store the input as a byte
         case "Interpulse Delay (us)":
-          tc.setInterpulseDelay(Integer.parseInt(theEvent.getStringValue()));
+          tc.setInterpulseDelay(intensity);
           break;
   
         // if user is setting recharge pulse width, store the input as a byte
         case "Recharge PW (us)":
-          tc.setRechargePulseWidth(Integer.parseInt(theEvent.getStringValue()));
+          tc.setRechargePulseWidth(intensity);
           break;
   
         // if user is setting pulse period, store the input as a byte
         case "Pulse Period (ms)":
-          tc.setPulsePeriod(Integer.parseInt(theEvent.getStringValue()));
+          tc.setPulsePeriod(intensity);
           break;
       }
-    
-      
-      
-    } catch (NumberFormatException e) {
+    }
+      catch (NumberFormatException e) {
       println("Error: Must enter valid integer input!");
+    }
+  }
+  if(checkBoxes.contains(theEvent.getName())){
+    switch(theEvent.getName()){
+      case "Channel 1 Stim: sink":
+        stimSet1 = true;
+        break;
+        
+      case "Channel 1 Stim: source":
+        stimSet1 = false;
+        break;
+      
+      case "Channel 2 Stim: sink":
+        stimSet2 = true;
+        break;
+       
+      case "Channel 2 Stim: source":
+        stimSet2 = false;
+        break;
+      
+      case "Channel 1 Rchrg: sink":
+        rchrgSet1 = true;
+        break;
+        
+      case "Channel 1 Rchrg: source":
+        rchrgSet1 = false;
+        break;
+        
+      case "Channel 2 Rchrg: sink":
+        rchrgSet2 = true;
+        break;
+        
+      case "Channel 2 Rchrg: source":
+        rchrgSet2 = false;
+        break;
     }
   }
 }
