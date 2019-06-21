@@ -40,42 +40,61 @@ public class SubChannelSetting {
       //if the intensity is within an acceptable range
     } else {
       
-      //set the intensity to 
+      //set the intensity to the user's input
       this.intensity = intensity;
     }
   }
   
+  //a method to retrieve the sink/source setting
   public boolean getSink() {
     return sink;
   }
   
+  //a method to retrieve the current amplitude intensity setting
   public int getIntensity() {
     return intensity;
   }
   
+  //a method to retrieve the current amplitude intensity setting as a byte
   private byte getIntensityAsByte() {
+    
     if (intensity == 0) {
       return 0;
+      
+      //if the intensity is not 0
     } else {
-      // Function from linear regression of experimental results
+      
+      // Store the percentage of maximum intensity, which is found using the function from linear regression of experimental results
       double percent = (1.12 * intensity + 3.35);
       
       // Convert from percent to a hex value
       byte hex = (byte) (percent * 255 / 100);
+      
+      // Return the byte
       return hex;
     }
   }
   
+  //a method to retrieve the current sink/source setting as a byte
   private byte getSinkAsByte() {
     if (intensity == 0) {
       return 0;
+      
+      //if the sink/source setting is true (represents sink)
     } else if (sink) {
+      
+      //return the byte value that represents a sink setting
       return SINK_BYTE;
+      
+      //if the sink/source setting is false (represents source)
     } else {
+      
+      //return the byte value that represents a source setting
       return SOURCE_BYTE;
     }
   }
   
+  //a method to store the sink/source setting and the intensity setting as a byte array
   public byte[] toBytes() {
     return new byte[]{getSinkAsByte(), getIntensityAsByte()};
   }
