@@ -6,8 +6,10 @@ public class AmplitudeSettings {
   private final byte[] START_BYTES = {0x00, (byte) 0x80, 0x0B, 0x11, 0x01};
   private final byte[] END_BYTES = {0x00, (byte) 0xC0};
   
+  //an array to store stim vs recharge settings
   private ChannelSetting[] channelSettings;
   
+  //a constructor to instantiate an array of the four possible channels
   public AmplitudeSettings() {
     channelSettings = new ChannelSetting[NUM_CHANNELS];
     for (int i = 0; i < NUM_CHANNELS; i++) {
@@ -15,11 +17,19 @@ public class AmplitudeSettings {
     }
   }
   
+  //a method to set the sink/source settings and intensity of the specified channel for the stim waveform
   public void setStimSetting(int channel, boolean sink, int intensity) {
+    
     // sets stim setting and sends it to the board
     try {
+      
+      //set the sink/source and intensity of the specified channel 
       channelSettings[channel - 1].setStimSetting(sink, intensity);
+      
+      //store the current sink/source setting and amplitude intensity of the specified channel
       SubChannelSetting newSettings = channelSettings[channel - 1].getStimSetting();
+      
+      //inform the user of the current settings
       println("Successfully set channel " + channel + " stim to " + (newSettings.getSink() ? "sink " : "source ") + newSettings.getIntensity() + " mA");
     } catch (ArrayIndexOutOfBoundsException e) {
       println(e);
