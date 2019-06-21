@@ -1,5 +1,8 @@
 public class AmplitudeSettings {
+  
   private static final int NUM_CHANNELS = 4;
+  
+  //byte arrays to store the numbers at the beginning and end of the hexadecimal that will set amplitude
   private final byte[] START_BYTES = {0x00, (byte) 0x80, 0x0B, 0x11, 0x01};
   private final byte[] END_BYTES = {0x00, (byte) 0xC0};
   
