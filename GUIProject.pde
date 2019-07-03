@@ -28,12 +28,6 @@ Table table = new Table();
 //Variables used to specifically name files stored as tables with information extracted from FRAM
 String filename;
 String storedFiles;
-int day = day();
-int month = month();
-int year = year();
-int hour = hour();
-int min = minute();
-int s = second();
 
 void setup() {
   
@@ -239,8 +233,16 @@ public void StopBuzzer(){
 
 //A button that will start stimulation once the timing and amplitude have been set, take note of the time and date, and prompt the FRAM to return stored data to a table
 public void startStim() {
+  
+  //variables to store the date and time of stimulation
+  int day = day();
+  int month = month();
+  int year = year();
+  int hour = hour();
+  int min = minute();
+  int s = second();
  
-  // a byte array to store the hexidecimals that will be start the stimulation
+  // a byte array to store the hexidecimals that will start the stimulation
   byte[] startingStim;
   startingStim = new byte[] { 0x00, (byte) 0x80, 0x0B, 0x01, 
                   0x03, 0x00, (byte) 0xC0 };
@@ -287,21 +289,39 @@ public void startStim() {
       row.setString("Time", str(hour) + ":" + str(min) + ":" + str(s));
       row.setString("Date", str(month) + "/" + str(day) + "/" + str(year));
       saveTable(table, filename);
+      
+      //and tell the user
+      println("No data was received");
     }
   }
   
-  //if the port is not available
+  //if there are no bytes available
   else{
     
-    //tell the user that no port is being detected
-    println("The data collection port is not detected");
+    //show in the table that no data was received
+    TableRow row = table.addRow();
+    row.setString("Data", "No data received");
+    row.setString("Time", str(hour) + ":" + str(min) + ":" + str(s));
+    row.setString("Date", str(month) + "/" + str(day) + "/" + str(year));
+    saveTable(table, filename);
+    
+    //and tell the user
+    println("No data was received");
   }
 }
 
 //A button to send the byte with timing settings to the WSS, timing byte built in TimingCommand class
 public void setTiming(){
   println("Setting timing");
+  tc.getTimingOutput()[0] = (byte) 0x00;
+  tc.getTimingOutput()[1] = (byte) 0x80;
+  tc.getTimingOutput()[2] = (byte) 0x0B;
+  tc.getTimingOutput()[3] = (byte) 0x05;
+  tc.getTimingOutput()[4] = (byte) 0x02;
+  tc.getTimingOutput()[9] = (byte) 0x00;
+  tc.getTimingOutput()[10] = (byte) 0xC0;
   tc.sendToSerialPort(thePort);
+  tc.printTimingOutput();
 }
 
 //A button to sent the byte with amplitude settings to the WSS, amplitude byte built in AmplitudeSettings class

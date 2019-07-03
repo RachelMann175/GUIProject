@@ -1,8 +1,7 @@
 class TimingCommand {
   
   //a byte array to store the timing setting hexadecimal
-  private byte[] timingOutput = {(byte) 0x00, (byte) 0x80, (byte) 0x0B, (byte) 0x05, (byte) 0x02,
-                           (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0xC0};
+  private byte[] timingOutput = new byte[11];
   
   //a method that can be used in GUIProject to send the byte to the correct port
   public void sendToSerialPort(Serial thePort){
@@ -20,6 +19,9 @@ class TimingCommand {
       
       //send the byte to the correct spot in the hexadecimal
       timingOutput[5] = stimPulseWidthByte;
+      
+      //tell the user
+      println("Stimulus pulse width set to " + stimPulseWidth);
     }
     
     //if the number inputed by the user is not within an acceptable range
@@ -44,6 +46,9 @@ class TimingCommand {
       
       //send the byte to the correct spot in the hexadecimal
       timingOutput[6] = interpulseDelayByte;
+      
+      //tell the user
+      println("Interpulse delay set to " + interpulseDelay);
     }
     
     //if the number inputed by the user is not within an acceptable range
@@ -68,6 +73,9 @@ class TimingCommand {
       
       //send the byte to the correct spot in the hexadecimal
       timingOutput[7] = rchrgPulseWidthByte;
+      
+      //tell the user
+      println("Recharge pulse width set to " + rechargePW);
     }
     
     //if the number inputed by the user is not within an acceptable range
@@ -78,6 +86,17 @@ class TimingCommand {
       
       //inform the user that they did not input a valid integer
       println("error: invalid integer for recharge pulse width, please choose a value between 0 and 255");
+    }
+  }
+  
+  //a class to get the timingOuput array, which will be used to instantiate the sections of the array that are not determined by the user
+  public byte[] getTimingOutput(){
+    return timingOutput;
+  }
+  
+  public void printTimingOutput(){
+    for(int i = 0; i < timingOutput.length; i++){
+      print(timingOutput[i] + ", ");
     }
   }
   
@@ -92,6 +111,9 @@ class TimingCommand {
       
       //send the byte to the correct spot in the hexadecimal
       timingOutput[8] = pulsePeriodByte;
+      
+      //tell the user
+      println("Pulse period set to " + pulsePeriod);
     }
     
     //if the number inputed by the user is not within an acceptable range

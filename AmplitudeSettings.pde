@@ -48,16 +48,29 @@ public class AmplitudeSettings {
   }
   
   public void sendSettingsToBoard(Serial port) {
-    port.write(START_BYTES);
     
+    //Two byte arrays for stim settings and recharge settings
+    byte[] STIM_SET_BYTES = new byte[4];
+    byte[] RCHRG_SET_BYTES = new byte[4];
+    
+    //for each setting in the channelSettings array
     for (ChannelSetting setting : channelSettings) {
-      port.write(setting.stimSettingToBytes());
+      
+      //send the proper hexadecimal to the stim set byte array
+      STIM_SET_BYTES = setting.stimSettingToBytes();
+      
+      //and send the proper hexadecimal to the recharge set byte array
+      RCHRG_SET_BYTES = setting.rchrgSettingToBytes();
     }
     
-    for (ChannelSetting setting : channelSettings) {
-      port.write(setting.rchrgSettingToBytes());
+    byte[] amplitudeArray = new byte[START_BYTES.length + STIM_SET_BYTES.length + RCHRG_SET_BYTES.length + END_BYTES.length];
+    System.arraycopy(START_BYTES, 0, amplitudeArray, 0, START_BYTES.length);
+    System.arraycopy(STIM_SET_BYTES, 0, amplitudeArray, START_BYTES.length, STIM_SET_BYTES.length);
+    System.arraycopy(RCHRG_SET_BYTES, 0, amplitudeArray, STIM_SET_BYTES.length, RCHRG_SET_BYTES.length);
+    System.arraycopy(END_BYTES, 0, amplitudeArray, RCHRG_SET_BYTES.length, END_BYTES.length);
+    port.write(amplitudeArray);
+    for(int i = 0; i < amplitudeArray.length; i++){
+      print(amplitudeArray[i] + ", ");
     }
-    
-    port.write(END_BYTES);
   }
 }
