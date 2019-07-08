@@ -71,17 +71,14 @@ public class SubChannelSetting {
       byte hex = (byte) (percent * 255 / 100);
       
       // Return the byte
+      
       return hex;
     }
   }
   
   //a method to retrieve the current sink/source setting as a byte
   private byte getSinkAsByte() {
-    if (intensity == 0) {
-      return 0;
-      
-      //if the sink/source setting is true (represents sink)
-    } else if (sink) {
+    if (sink) {
       
       //return the byte value that represents a sink setting
       return SINK_BYTE;
