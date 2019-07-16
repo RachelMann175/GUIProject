@@ -27,7 +27,7 @@ Table table = new Table();
 
 //Variables used to specifically name files stored as tables with information extracted from FRAM
 String filename;
-String storedFiles;
+byte[] byteFiles;
 
 void setup() {
   
@@ -229,10 +229,12 @@ public void StopBuzzer(){
                       
   //writing the byte array to the serial port
   thePort.write(stopBuzz);
+  
+  println("Stopping buzzer");
 }
 
 //A button that will start stimulation once the timing and amplitude have been set, take note of the time and date, and prompt the FRAM to return stored data to a table
-public void startStim() {
+public void startStim() throws InterruptedException {
   
   //variables to store the date and time of stimulation
   int day = day();
@@ -247,6 +249,7 @@ public void startStim() {
   startingStim = new byte[] { 0x00, (byte) 0x80, 0x0B, 0x01, 
                   0x03, 0x00, (byte) 0xC0 };
   
+  println();
   println("Starting Stim");
   
   //writing the byte array to the serial port
@@ -258,21 +261,31 @@ public void startStim() {
   
   //a byte to prompt the FRAM to send data back to the user's computer
   byte[] framReadByte = new byte[]{0x00, (byte) 0x80, 0x09, 0x03, (byte) 0xFF, (byte) 0xC0};
+  byte[] framReadByte2 = new byte[]{0x00, (byte) 0x80, 0x09};
+  
+  //wait for .5 seconds
+  Thread.sleep(500);
   
   //writing the byte array to the port
-  thePort.write(framReadByte);
+  //commented out for timing and amplitude testing 
+  //thePort.write(framReadByte);
+  
+  //because originally the board only sends stimulus after pressing the startStim button twice
+  thePort.write(startingStim);
   
   //if the port is available
-  if(thePort.available() > 0) {
+  while(thePort.available() > 0) {
     
     //read the hexadecimals sent from the FRAM, and store them as a String
-    storedFiles = thePort.readString();
-    println(storedFiles);
+    byteFiles = thePort.readBytes();
+    thePort.readBytes(byteFiles);
     
     //if the data collected from the FRAM is not null
-    if(storedFiles != null){
+    if(byteFiles != null){
       
       //add the data to the Data column of the table
+      String storedFiles = new String(byteFiles);
+      println(storedFiles);
       TableRow row = table.addRow();
       row.setString("Data", storedFiles);
       row.setString("Time", str(hour) + ":" + str(min) + ":" + str(s));
@@ -285,34 +298,33 @@ public void startStim() {
       
       //show in the table that no data was received
       TableRow row = table.addRow();
-      row.setString("Data", "No data received");
+      println("Null data received");
+      row.setString("Data", "Null data received");
       row.setString("Time", str(hour) + ":" + str(min) + ":" + str(s));
       row.setString("Date", str(month) + "/" + str(day) + "/" + str(year));
       saveTable(table, filename);
       
-      //and tell the user
-      println("No data was received");
     }
   }
   
   //if there are no bytes available
-  else{
+  if(thePort.available() == 0){
     
     //show in the table that no data was received
     TableRow row = table.addRow();
-    row.setString("Data", "No data received");
+    println("There are no bytes available");
+    row.setString("Data", "No bytes available");
     row.setString("Time", str(hour) + ":" + str(min) + ":" + str(s));
     row.setString("Date", str(month) + "/" + str(day) + "/" + str(year));
     saveTable(table, filename);
-    
-    //and tell the user
-    println("No data was received");
+   
   }
 }
 
-//A button to send the byte with timing settings to the WSS, timing byte built in TimingCommand class
+//A button to send the byte with timing settings to the WSS, rest of timing byte built in TimingCommand class
 public void setTiming(){
-  println("Setting timing");
+  println();
+  println("Timing array");
   tc.getTimingOutput()[0] = (byte) 0x00;
   tc.getTimingOutput()[1] = (byte) 0x80;
   tc.getTimingOutput()[2] = (byte) 0x0B;
@@ -326,7 +338,6 @@ public void setTiming(){
 
 //A button to sent the byte with amplitude settings to the WSS, amplitude byte built in AmplitudeSettings class
 public void setAmplitude(){
-  println("Setting amplitude");
   amplitudes.sendSettingsToBoard(thePort);
 } 
 
