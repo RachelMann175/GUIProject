@@ -149,7 +149,7 @@ void setup() {
   //Adding the bang event names to the buttons list
   buttons = Arrays.asList("ClearPulseTimings", "ClearAmplitudes", "startStim",
                           "setTiming", "setAmplitude", "Buzzer", "StopBuzzer",
-                          "GetHistory");
+                          "GetHistory", "TurnOnLEDs");
                           
   cp5.addBang("ClearPulseTimings")
   .setPosition(240,50)
@@ -196,12 +196,17 @@ void setup() {
   .setSize(80,40)
   .getCaptionLabel().align(ControlP5.CENTER, ControlP5.CENTER);
   
+  cp5.addBang("TurnOnLEDs")
+  .setPosition(480,190)
+  .setSize(80,40)
+  .getCaptionLabel().align(ControlP5.CENTER, ControlP5.CENTER);
+  
   textFont(font);
   
   //Serial variables and baud rate settings
   int baudRate = 115200;
-  //String portName = Serial.list()[0];
-  //thePort = new Serial(this, portName, baudRate);
+  String portName = Serial.list()[0];
+  thePort = new Serial(this, portName, baudRate);
   
   background(0);
   fill(255);
@@ -236,6 +241,21 @@ public void StopBuzzer(){
   println("Stopping buzzer");
 }
 
+//A button to turn on the LED lights
+public void turnOnLEDs(){
+  
+  //a byte array to store the hexadecimals that will turn on the LEDs
+  byte[] LEDByte = {0x00, (byte) 0x80, (byte) 0x08, 0x02, 0x01, (byte) 0x0F, 
+                    0x00, (byte) 0xC0};
+  
+  //writing the byte array to the serial port
+  thePort.write(LEDByte);
+  
+  //tell the user
+  println();
+  println("Turning on LEDs");
+}
+
 //A button that will start stimulation once the timing and amplitude have been set, take note of the time and date, and prompt the FRAM to return stored data to a table
 public void startStim() throws InterruptedException {
   
@@ -262,16 +282,8 @@ public void startStim() throws InterruptedException {
   filename = "C:\\Users\\Setup\\Documents\\GitHub\\GUIProject\\data\\" + str(month) + "-" + str(day) + "--" + str(hour) 
              + "-" + str(min) + "-" + str(s) + ".csv";
   
-  //a byte to prompt the FRAM to send data back to the user's computer
-  byte[] framReadByte = new byte[]{0x00, (byte) 0x80, 0x09, 0x03, (byte) 0xFF, (byte) 0xC0};
-  byte[] framReadByte2 = new byte[]{0x00, (byte) 0x80, 0x09};
-  
   //wait for .5 seconds
   Thread.sleep(500);
-  
-  //writing the byte array to the port
-  //commented out for timing and amplitude testing 
-  //thePort.write(framReadByte);
   
   //because originally the board only sends stimulus after pressing the startStim button twice
   thePort.write(startingStim);
