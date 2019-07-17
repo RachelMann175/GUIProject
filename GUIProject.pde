@@ -29,9 +29,12 @@ Table table = new Table();
 String filename;
 byte[] byteFiles;
 
+public void settings(){
+  size(700,1600);
+}
+
 void setup() {
   
-  size(700,1600);
   PFont font = createFont("Arial", 20);
   
   cp5 = new ControlP5(this);
@@ -197,8 +200,8 @@ void setup() {
   
   //Serial variables and baud rate settings
   int baudRate = 115200;
-  String portName = Serial.list()[0];
-  thePort = new Serial(this, portName, baudRate);
+  //String portName = Serial.list()[0];
+  //thePort = new Serial(this, portName, baudRate);
   
   background(0);
   fill(255);
