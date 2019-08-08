@@ -12,10 +12,10 @@ class TimingCommand {
   public void setStimPulseWidth(int stimPulseWidth){
     
     //if the number inputed by the user is within an acceptable range
-    if(stimPulseWidth > 0 && stimPulseWidth < 256){
+    if(stimPulseWidth > 0 && stimPulseWidth < 300){
       
-      //convert the input to a byte
-      byte stimPulseWidthByte = (byte) stimPulseWidth;
+      //Use conversion factors found using characterization chart
+      byte stimPulseWidthByte = (byte)((.9644 * stimPulseWidth) + 6);
       
       //send the byte to the correct spot in the hexadecimal
       timingOutput[5] = stimPulseWidthByte;
@@ -66,10 +66,10 @@ class TimingCommand {
   public void setRechargePulseWidth(int rechargePW){
     
     //if the number inputed by the user is in an acceptable range
-    if(rechargePW > 0 && rechargePW < 255){
+    if(rechargePW > 0 && rechargePW < 300){
       
-      //convert the input to a byte
-      byte rchrgPulseWidthByte = (byte) rechargePW;
+      //Use conversion factors found using characterization chart
+      byte rchrgPulseWidthByte = (byte)((.9644 * rechargePW) + 6);
       
       //send the byte to the correct spot in the hexadecimal
       timingOutput[7] = rchrgPulseWidthByte;
@@ -104,10 +104,10 @@ class TimingCommand {
   public void setPulsePeriod(int pulsePeriod){
     
     //if the number inputed by the user is in an acceptable range
-    if(pulsePeriod > 0 && pulsePeriod < 255){
+    if(pulsePeriod > 0 && pulsePeriod < 2551000){
       
-      //convert the input to a byte
-      byte pulsePeriodByte = (byte) pulsePeriod;
+      //convert the input to the proper hex value? Found using Excel
+      byte pulsePeriodByte = (byte) (1.0133 * pulsePeriod);
       
       //send the byte to the correct spot in the hexadecimal
       timingOutput[8] = pulsePeriodByte;

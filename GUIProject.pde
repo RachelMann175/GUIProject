@@ -3,6 +3,7 @@ import processing.serial.*;
 import java.util.List;
 import java.util.Arrays;
 import java.io.File;
+import javax.xml.bind.DatatypeConverter;
 
 String textValue = "";
 ControlP5 cp5;
@@ -82,6 +83,12 @@ void setup() {
   .setFont(font)
   .setAutoClear(false);
   
+  cp5.addBang("Stim 1: Up")
+  .setPosition(240,330)
+  .setImage(loadImage("Up-Arrow.png"))
+  .updateSize()
+  .getCaptionLabel().align(ControlP5.CENTER, ControlP5.CENTER);
+  
   cp5.addTextfield("Channel 1 Rchrg: mA")
   .setPosition(20,470)
   .setSize(200,40)
@@ -150,14 +157,15 @@ void setup() {
   buttons = Arrays.asList("ClearPulseTimings", "ClearAmplitudes", "startStim",
                           "setTiming", "setAmplitude", "Buzzer", "StopBuzzer",
                           "GetHistory", "TurnOnLEDs");
+                                                  
                           
   cp5.addBang("ClearPulseTimings")
-  .setPosition(240,50)
+  .setPosition(420,890)
   .setSize(80, 40)
   .getCaptionLabel().align(ControlP5.CENTER, ControlP5.CENTER);
   
   cp5.addBang("ClearAmplitudes")
-  .setPosition(240,330)
+  .setPosition(320,890)
   .setSize(80,40)
   .getCaptionLabel().align(ControlP5.CENTER, ControlP5.CENTER);
   
@@ -213,6 +221,7 @@ void setup() {
 }
 
 void draw(){
+  
 }
 
 //A button to start the buzzer, used for preliminary testing of the WSS board
@@ -286,7 +295,7 @@ public void startStim() throws InterruptedException {
   Thread.sleep(500);
   
   //because originally the board only sends stimulus after pressing the startStim button twice
-  thePort.write(startingStim);
+  //thePort.write(startingStim);
   
   //if the port is available
   while(thePort.available() > 0) {
@@ -299,7 +308,9 @@ public void startStim() throws InterruptedException {
     if(byteFiles != null){
       
       //add the data to the Data column of the table
-      String storedFiles = new String(byteFiles);
+      String storedFiles = DatatypeConverter.printHexBinary(byteFiles);
+      storedFiles = storedFiles.replaceAll("..", "$0 ");
+      println();
       println(storedFiles);
       TableRow row = table.addRow();
       row.setString("Data", storedFiles);
