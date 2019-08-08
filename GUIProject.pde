@@ -4,6 +4,9 @@ import java.util.List;
 import java.util.Arrays;
 import java.io.File;
 import javax.xml.bind.DatatypeConverter;
+import java.util.Scanner;
+import java.io.FileNotFoundException;
+
 
 String textValue = "";
 ControlP5 cp5;
@@ -29,6 +32,8 @@ Table table = new Table();
 //Variables used to specifically name files stored as tables with information extracted from FRAM
 String filename;
 byte[] byteFiles;
+
+class AdvancedSettings extends PApplet{
 
 public void settings(){
   size(700,1600);
@@ -84,8 +89,14 @@ void setup() {
   .setAutoClear(false);
   
   cp5.addBang("Stim 1: Up")
-  .setPosition(240,330)
-  .setImage(loadImage("Up-Arrow.png"))
+  .setPosition(240,310)
+  .setImage(loadImage("C://Users//Setup//Documents//GitHub//GUIProject//Small-up-arrow.png"))
+  .updateSize()
+  .getCaptionLabel().align(ControlP5.CENTER, ControlP5.CENTER);
+  
+  cp5.addBang("Stim 1: Down")
+  .setPosition(300,310)
+  .setImage(loadImage("C://Users//Setup//Documents//GitHub//GUIProject//Small-down-arrow.png"))
   .updateSize()
   .getCaptionLabel().align(ControlP5.CENTER, ControlP5.CENTER);
   
@@ -95,17 +106,53 @@ void setup() {
   .setFont(font)
   .setAutoClear(false);
   
+  cp5.addBang("Rchrg 1: Up")
+  .setPosition(240,450)
+  .setImage(loadImage("C://Users//Setup//Documents//GitHub//GUIProject//Small-up-arrow.png"))
+  .updateSize()
+  .getCaptionLabel().align(ControlP5.CENTER, ControlP5.CENTER);
+  
+  cp5.addBang("Rchrg 1: Down")
+  .setPosition(300,450)
+  .setImage(loadImage("C://Users//Setup//Documents//GitHub//GUIProject//Small-down-arrow.png"))
+  .updateSize()
+  .getCaptionLabel().align(ControlP5.CENTER, ControlP5.CENTER);  
+  
   cp5.addTextfield("Channel 2 Stim: mA")
   .setPosition(20,610)
   .setSize(200,40)
   .setFont(font)
   .setAutoClear(false);
   
+  cp5.addBang("Stim 2: Up")
+  .setPosition(240,590)
+  .setImage(loadImage("C://Users//Setup//Documents//GitHub//GUIProject//Small-up-arrow.png"))
+  .updateSize()
+  .getCaptionLabel().align(ControlP5.CENTER, ControlP5.CENTER);
+  
+  cp5.addBang("Stim 2: Down")
+  .setPosition(300,590)
+  .setImage(loadImage("C://Users//Setup//Documents//GitHub//GUIProject//Small-down-arrow.png"))
+  .updateSize()
+  .getCaptionLabel().align(ControlP5.CENTER, ControlP5.CENTER);
+  
   cp5.addTextfield("Channel 2 Rchrg: mA")
   .setPosition(20,750)
   .setSize(200,40)
   .setFont(font)
   .setAutoClear(false);
+  
+  cp5.addBang("Rchrg 2: Up")
+  .setPosition(240,730)
+  .setImage(loadImage("C://Users//Setup//Documents//GitHub//GUIProject//Small-up-arrow.png"))
+  .updateSize()
+  .getCaptionLabel().align(ControlP5.CENTER, ControlP5.CENTER);
+  
+  cp5.addBang("Rchrg 2: Down")
+  .setPosition(300,730)
+  .setImage(loadImage("C://Users//Setup//Documents//GitHub//GUIProject//Small-down-arrow.png"))
+  .updateSize()
+  .getCaptionLabel().align(ControlP5.CENTER, ControlP5.CENTER);
   
   //Adding the checkbox event names to the checkBoxes list
   checkBoxes = Arrays.asList("Channel 1 Stim: sink", "Channel 1 Stim: source",
@@ -213,8 +260,8 @@ void setup() {
   
   //Serial variables and baud rate settings
   int baudRate = 115200;
-  String portName = Serial.list()[0];
-  thePort = new Serial(this, portName, baudRate);
+  //String portName = Serial.list()[0];
+  //thePort = new Serial(this, portName, baudRate);
   
   background(0);
   fill(255);
@@ -281,6 +328,11 @@ public void startStim() throws InterruptedException {
   startingStim = new byte[] { 0x00, (byte) 0x80, 0x0B, 0x01, 
                   0x03, 0x00, (byte) 0xC0 };
   
+  // a byte array to read 200 bytes from the FRAM                
+  byte[] readData;
+  readData = new byte[] { 0x00, (byte) 0x80, 0x09, 0x01, 
+                      0x05, 0x00, (byte) 0xC0 };
+  
   println();
   println("Starting Stim");
   
@@ -294,13 +346,13 @@ public void startStim() throws InterruptedException {
   //wait for .5 seconds
   Thread.sleep(500);
   
-  //because originally the board only sends stimulus after pressing the startStim button twice
-  //thePort.write(startingStim);
-  
   //if the port is available
   while(thePort.available() > 0) {
     
-    //read the hexadecimals sent from the FRAM, and store them as a String
+    //read data from the board
+    thePort.write(readData);
+    
+    //and store that data as a String
     byteFiles = thePort.readBytes();
     thePort.readBytes(byteFiles);
     
@@ -368,22 +420,18 @@ public void setAmplitude(){
 } 
 
 //A button to print the table that stores FRAM data
-public void GetHistory(){
-  println(table.getColumnTitles());
-  for(TableRow row : table.rows()){
-    for(int i = 0; i < row.getColumnCount(); i++){
-      print(row.getString(i) + " ");
-    }
-    println();
+public void GetHistory() throws FileNotFoundException{
+  Scanner scanner = new Scanner(new File(filename));
+  scanner.useDelimiter(",");
+  while(scanner.hasNext()){
+    System.out.print(scanner.next() + " ");
   }
 }
 
 //A button to delete the files that store the FRAM data tables
 public void ClearHistory(){
   File f = new File(filename);
-  println(filename);
   if(f.exists()){
-    println(f.getAbsolutePath());
     f.delete();
     println("History cleared");
   }
@@ -407,6 +455,7 @@ public void ClearAmplitudes() {
   cp5.get(Textfield.class,"Channel 1 Rchrg: Source mA").clear();
   cp5.get(Textfield.class,"Channel 2 Rchrg: Sink mA").clear();
 }
+
 
 //A method to access the other classes in order to set amplitude and timing when the 'enter' button is pressed in each textfield
 void controlEvent(ControlEvent theEvent){
@@ -546,7 +595,7 @@ void controlEvent(ControlEvent theEvent){
     }
   }
 }
-
+}
 
 
 
