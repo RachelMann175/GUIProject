@@ -14,8 +14,7 @@ class TimingCommand {
     //if the number inputed by the user is within an acceptable range
     if(stimPulseWidth > 0 && stimPulseWidth < 300){
       
-      //Use conversion factors found using characterization chart
-      byte stimPulseWidthByte = (byte)((.9644 * stimPulseWidth) + 6);
+      byte stimPulseWidthByte = (byte) stimPulseWidth;
       
       //send the byte to the correct spot in the hexadecimal
       timingOutput[5] = stimPulseWidthByte;
@@ -66,10 +65,10 @@ class TimingCommand {
   public void setRechargePulseWidth(int rechargePW){
     
     //if the number inputed by the user is in an acceptable range
-    if(rechargePW > 0 && rechargePW < 300){
+    if(rechargePW > 0 && rechargePW < 255){
       
       //Use conversion factors found using characterization chart
-      byte rchrgPulseWidthByte = (byte)((.9644 * rechargePW) + 6);
+      byte rchrgPulseWidthByte = (byte)(rechargePW);
       
       //send the byte to the correct spot in the hexadecimal
       timingOutput[7] = rchrgPulseWidthByte;
@@ -101,13 +100,12 @@ class TimingCommand {
   }
   
   // convert reasonable user input for recharge pulse width to bytes
-  public void setPulsePeriod(int pulsePeriod){
+  public void setPulsePeriod(double pulsePeriod){
     
     //if the number inputed by the user is in an acceptable range
-    if(pulsePeriod > 0 && pulsePeriod < 2551000){
+    if(pulsePeriod > 0 && pulsePeriod < 255){
       
-      //convert the input to the proper hex value? Found using Excel
-      byte pulsePeriodByte = (byte) (1.0133 * pulsePeriod);
+      byte pulsePeriodByte = (byte) (pulsePeriod);
       
       //send the byte to the correct spot in the hexadecimal
       timingOutput[8] = pulsePeriodByte;
@@ -124,6 +122,7 @@ class TimingCommand {
       
       //inform the user that they did not input a valid integer
       println("error: invalid integer for pulse period, please choose a value between 0 and 255");
+      println(pulsePeriod);
     }
   }
 }

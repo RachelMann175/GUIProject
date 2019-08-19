@@ -1,6 +1,8 @@
-/*Serial thePort = new Serial(this, Serial.list()[0], 115200);
-
-public class BatteryLogging extends Thread {
+/* public class BatteryLogging extends PApplet {
+  
+  void setup(){
+    Serial thePort = new Serial(this, Serial.list()[0], 115200);
+  }
   
   public void run() {
     int day = day();

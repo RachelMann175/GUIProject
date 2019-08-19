@@ -6,10 +6,6 @@ import javax.xml.bind.DatatypeConverter;
 import java.util.Scanner;
 import java.io.FileNotFoundException;
 
-Serial thePort;
-TimingCommand tc = new TimingCommand();
-AmplitudeSettings amplitudes = new AmplitudeSettings();
-
 //Lists used to group the different types of events that can occur
 List<String> amplitudeInputs;
 List<String> timingInputs;
@@ -266,8 +262,8 @@ void setup() {
   
   //Serial variables and baud rate settings
   int baudRate = 115200;
-  //String portName = Serial.list()[0];
-  //thePort = new Serial(this, portName, baudRate);
+  String portName = Serial.list()[0];
+  thePort = new Serial(this, portName, baudRate);
   
   background(0);
   fill(255);
@@ -505,15 +501,13 @@ public void ClearAmplitudes() {
 
 //A method to access the other classes in order to set amplitude and timing when the 'enter' button is pressed in each textfield
 void controlEvent(ControlEvent theEvent){
-  
-  int intensity = Integer.parseInt(theEvent.getStringValue());
 
   //if the user is trying to enter amplitude and timing settings
   if(amplitudeInputs.contains(theEvent.getName()) || timingInputs.contains(theEvent.getName())){
     try {  
       
       //store the number they have entered
-      intensity = Integer.parseInt(theEvent.getStringValue());
+      int intensity = Integer.parseInt(theEvent.getStringValue());
       
       switch(theEvent.getName()){
         
@@ -642,7 +636,7 @@ void controlEvent(ControlEvent theEvent){
   }
   
   //if the user pushes one of the arrow buttons
-  if(buttons.contains(theEvent.getName())){
+  /*if(buttons.contains(theEvent.getName())){
     
     
     
@@ -675,6 +669,6 @@ void controlEvent(ControlEvent theEvent){
       case "Rchrg2Down":
         amplitudes.setRchrgSetting(2, rchrgSet2, intensity--);
     }
-  }
+  }*/
 }
 }
