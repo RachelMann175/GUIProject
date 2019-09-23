@@ -484,10 +484,12 @@ public void CheckBattery(){
   //convert the byte array to a string
   if(batteryReturn != null){
     String storedFiles = DatatypeConverter.printHexBinary(batteryReturn);
-    storedFiles = storedFiles.replaceAll("..", "$0 ");
+    String importantDigits = storedFiles.substring(12,16);
+    int importantNum = Integer.parseInt(importantDigits,16);
+    float finalNum = importantNum / 4095 * 2.5 * 2;
     println();
     println("Battery status is: ");
-    println(storedFiles);
+    println(finalNum + "%");
   }
 }
 

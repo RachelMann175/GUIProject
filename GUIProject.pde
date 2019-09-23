@@ -70,7 +70,8 @@ void setup(){
   
   simpleButtons = Arrays.asList("StartStim", "StopStim", 
                                  "SetAmplitude", "SetTiming",
-                                 "Amplitude Up", "Amplitude Down");
+                                 "Amplitude Up", "Amplitude Down",
+                                 "GetBatteryStatus");
   
   cp5.addBang("StartStim")
   .setPosition(20,610)
@@ -93,8 +94,23 @@ void setup(){
   .getCaptionLabel().align(ControlP5.CENTER, ControlP5.CENTER);
   
   cp5.addBang("OpenAdvancedSettings")
-  .setPosition(20,750)
+  .setPosition(20,890)
   .setSize(400,40)
+  .getCaptionLabel().align(ControlP5.CENTER, ControlP5.CENTER);
+  
+  cp5.addBang("Get History")
+  .setPosition(20,750)
+  .setSize(200,40)
+  .getCaptionLabel().align(ControlP5.CENTER, ControlP5.CENTER);
+  
+  cp5.addBang("Clear History")
+  .setPosition(250,750)
+  .setSize(200,40)
+  .getCaptionLabel().align(ControlP5.CENTER, ControlP5.CENTER);
+  
+  cp5.addBang("GetBatteryStatus")
+  .setPosition(480,750)
+  .setSize(200,40)
   .getCaptionLabel().align(ControlP5.CENTER, ControlP5.CENTER);
   
 }
@@ -158,6 +174,10 @@ void controlEvent(ControlEvent theEvent) throws InterruptedException {
       
       case "StopStim" :
       as.stopStim();
+      break;
+      
+      case "GetBatteryStatus" :
+      as.CheckBattery();
       break;
       
       case "Amplitude Up" :
