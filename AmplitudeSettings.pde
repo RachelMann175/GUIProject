@@ -18,6 +18,10 @@ public class AmplitudeSettings {
     }
   }
   
+  public ChannelSetting[] getChannelSettings(){
+    return channelSettings;
+  }
+  
   //a method to set the sink/source settings and intensity of the specified channel for the stim waveform
   public void setStimSetting(int channel, boolean sink, int intensity) {
     

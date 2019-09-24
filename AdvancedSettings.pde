@@ -88,7 +88,7 @@ void setup() {
   .getCaptionLabel().align(ControlP5.CENTER, ControlP5.CENTER);
   
   cp5.addBang("Stim1Down")
-  .setPosition(300,310)
+  .setPosition(420,310)
   .setImage(loadImage("C://Users//Setup//Documents//GitHub//GUIProject//Small-down-arrow.png"))
   .updateSize()
   .getCaptionLabel().align(ControlP5.CENTER, ControlP5.CENTER);
@@ -106,7 +106,7 @@ void setup() {
   .getCaptionLabel().align(ControlP5.CENTER, ControlP5.CENTER);
   
   cp5.addBang("Rchrg1Down")
-  .setPosition(300,450)
+  .setPosition(420,450)
   .setImage(loadImage("C://Users//Setup//Documents//GitHub//GUIProject//Small-down-arrow.png"))
   .updateSize()
   .getCaptionLabel().align(ControlP5.CENTER, ControlP5.CENTER);  
@@ -124,7 +124,7 @@ void setup() {
   .getCaptionLabel().align(ControlP5.CENTER, ControlP5.CENTER);
   
   cp5.addBang("Stim2Down")
-  .setPosition(300,590)
+  .setPosition(420,590)
   .setImage(loadImage("C://Users//Setup//Documents//GitHub//GUIProject//Small-down-arrow.png"))
   .updateSize()
   .getCaptionLabel().align(ControlP5.CENTER, ControlP5.CENTER);
@@ -142,7 +142,7 @@ void setup() {
   .getCaptionLabel().align(ControlP5.CENTER, ControlP5.CENTER);
   
   cp5.addBang("Rchrg2Down")
-  .setPosition(300,730)
+  .setPosition(420,730)
   .setImage(loadImage("C://Users//Setup//Documents//GitHub//GUIProject//Small-down-arrow.png"))
   .updateSize()
   .getCaptionLabel().align(ControlP5.CENTER, ControlP5.CENTER);
@@ -444,6 +444,7 @@ public void GetHistory() throws FileNotFoundException{
   while(scanner.hasNext()){
     System.out.print(scanner.next() + " ");
   }
+  scanner.close();
 }
 
 //A button to delete the files that store the FRAM data tables
@@ -483,10 +484,12 @@ public void CheckBattery(){
   //convert the byte array to a string
   if(batteryReturn != null){
     String storedFiles = DatatypeConverter.printHexBinary(batteryReturn);
-    storedFiles = storedFiles.replaceAll("..", "$0 ");
+    String importantDigits = storedFiles.substring(12,16);
+    int importantNum = Integer.parseInt(importantDigits,16);
+    float finalNum = importantNum / 4095 * 2.5 * 2;
     println();
     println("Battery status is: ");
-    println(storedFiles);
+    println(finalNum + "%");
   }
 }
 
@@ -636,9 +639,12 @@ void controlEvent(ControlEvent theEvent){
   }
   
   //if the user pushes one of the arrow buttons
-  /*if(buttons.contains(theEvent.getName())){
+  if(buttons.contains(theEvent.getName())){
     
-    
+    int stimIntensity1 = amplitudes.getChannelSettings()[0].getStimSetting().getIntensity();
+    int rchrgIntensity1 = amplitudes.getChannelSettings()[0].getRchrgSetting().getIntensity();
+    int stimIntensity2 = amplitudes.getChannelSettings()[1].getStimSetting().getIntensity();
+    int rchrgIntensity2 = amplitudes.getChannelSettings()[1].getRchrgSetting().getIntensity();
     
     switch(theEvent.getName()){
       
@@ -646,29 +652,45 @@ void controlEvent(ControlEvent theEvent){
       case "Stim1Up":
       
         //change the intensity
-        amplitudes.setStimSetting(1, stimSet1, intensity++);
+        stimIntensity1++;
+        amplitudes.setStimSetting(1, stimSet1, stimIntensity1);
+        break;
         
       case "Stim1Down":
-        amplitudes.setStimSetting(1, stimSet1, intensity--);
+        stimIntensity1--;
+        amplitudes.setStimSetting(1, stimSet1, stimIntensity1);
+        break;
         
       case "Rchrg1Up":
-        amplitudes.setRchrgSetting(1, rchrgSet1, intensity++);
+        rchrgIntensity1++;
+        amplitudes.setRchrgSetting(1, rchrgSet1, rchrgIntensity1);
+        break;
         
       case "Rchrg1Down":
-        amplitudes.setRchrgSetting(1, rchrgSet1, intensity--);
+        rchrgIntensity1--;
+        amplitudes.setRchrgSetting(1, rchrgSet1, rchrgIntensity1);
+        break;
         
       case "Stim2Up":
-        amplitudes.setStimSetting(2, stimSet2, intensity++);
+        stimIntensity2++;
+        amplitudes.setStimSetting(2, stimSet2, stimIntensity2);
+        break;
         
       case "Stim2Down":
-        amplitudes.setStimSetting(2, stimSet2, intensity--);
+        stimIntensity2--;
+        amplitudes.setStimSetting(2, stimSet2, stimIntensity2);
+        break;
         
       case "Rchrg2Up":
-        amplitudes.setRchrgSetting(2, rchrgSet2, intensity++);
+        rchrgIntensity2++;
+        amplitudes.setRchrgSetting(2, rchrgSet2, rchrgIntensity2);
+        break;
         
       case "Rchrg2Down":
-        amplitudes.setRchrgSetting(2, rchrgSet2, intensity--);
+        rchrgIntensity2--;
+        amplitudes.setRchrgSetting(2, rchrgSet2, rchrgIntensity2);
+        break;
     }
-  }*/
+  }
 }
 }

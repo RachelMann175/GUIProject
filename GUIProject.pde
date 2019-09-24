@@ -7,6 +7,7 @@ List<String> simpleSettingEvents;
 List<String> simpleButtons;
 
 Serial thePort;
+Textlabel textLabel;
 TimingCommand tc = new TimingCommand();
 AmplitudeSettings amplitudes = new AmplitudeSettings();
 
@@ -15,41 +16,44 @@ public void settings() {
 }
 
 void draw() {
+  background(0);
 }
   
 void setup(){
   
+  PFont font = createFont("Arial", 20);
   int baudRate = 115200;
   String portName = Serial.list()[0];
   thePort = new Serial(this, portName, baudRate);
   
   //batteryThread = new BatteryLogging();
-  //batteryThread.start();
+  //batteryThread.run();
   cp5 = new ControlP5(this);
   background(0);
   as = new AdvancedSettings();
   
   simpleSettingEvents= Arrays.asList("Amplitude: mA", "Frequency: Hz",
-                                   "Pulsewidth: us", "Amplitude Up", "Amplitude Down");
+                                   "Pulsewidth: us");
   
   cp5.addTextfield("Amplitude: mA")
   .setPosition(20,50)
   .setSize(200,40)
   .setAutoClear(false);
   
-  cp5.addTextfield("Current Amplitude")
+  textLabel = cp5.addTextlabel("Current Amplitude")
   .setPosition(260,50)
   .setSize(200,40)
-  .setAutoClear(false);
+  .setStringValue("")
+  .setFont(font);
   
   cp5.addBang("Amplitude Up")
-  .setPosition(500,30)
+  .setPosition(400,30)
   .setImage(loadImage("C://Users//Setup//Documents//GitHub//GUIProject//Small-up-arrow.png"))
   .updateSize()
   .getCaptionLabel().align(ControlP5.CENTER, ControlP5.CENTER);
   
   cp5.addBang("Amplitude Down")
-  .setPosition(560,30)
+  .setPosition(580,30)
   .setImage(loadImage("C://Users//Setup//Documents//GitHub//GUIProject//Small-down-arrow.png"))
   .updateSize()
   .getCaptionLabel().align(ControlP5.CENTER, ControlP5.CENTER);
@@ -65,7 +69,9 @@ void setup(){
   .setAutoClear(false);
   
   simpleButtons = Arrays.asList("StartStim", "StopStim", 
-                                 "SetAmplitude", "SetTiming");
+                                 "SetAmplitude", "SetTiming",
+                                 "Amplitude Up", "Amplitude Down",
+                                 "GetBatteryStatus");
   
   cp5.addBang("StartStim")
   .setPosition(20,610)
@@ -88,8 +94,23 @@ void setup(){
   .getCaptionLabel().align(ControlP5.CENTER, ControlP5.CENTER);
   
   cp5.addBang("OpenAdvancedSettings")
-  .setPosition(20,750)
+  .setPosition(20,890)
   .setSize(400,40)
+  .getCaptionLabel().align(ControlP5.CENTER, ControlP5.CENTER);
+  
+  cp5.addBang("Get History")
+  .setPosition(20,750)
+  .setSize(200,40)
+  .getCaptionLabel().align(ControlP5.CENTER, ControlP5.CENTER);
+  
+  cp5.addBang("Clear History")
+  .setPosition(250,750)
+  .setSize(200,40)
+  .getCaptionLabel().align(ControlP5.CENTER, ControlP5.CENTER);
+  
+  cp5.addBang("GetBatteryStatus")
+  .setPosition(480,750)
+  .setSize(200,40)
   .getCaptionLabel().align(ControlP5.CENTER, ControlP5.CENTER);
   
 }
@@ -97,10 +118,9 @@ void setup(){
 
 void controlEvent(ControlEvent theEvent) throws InterruptedException {
   
-  //int intensity = Integer.parseInt(theEvent.getStringValue());
-  
   if(theEvent.getName() == "OpenAdvancedSettings"){
     String[] args = {"Opening advanced settings"};
+    thePort.stop();
     AdvancedSettings window = new AdvancedSettings();
     PApplet.runSketch(args, window);
   }
@@ -115,6 +135,7 @@ void controlEvent(ControlEvent theEvent) throws InterruptedException {
       amplitudes.setRchrgSetting(1, false, intensity);
       amplitudes.setStimSetting(2, false, intensity);
       amplitudes.setRchrgSetting(2, false, intensity);
+      textLabel.setText(str(intensity));
       break;
       
       case "Frequency: Hz" :
@@ -131,6 +152,12 @@ void controlEvent(ControlEvent theEvent) throws InterruptedException {
     }
   }
   if(simpleButtons.contains(theEvent.getName())){
+    
+    int stimIntensity1 = amplitudes.getChannelSettings()[0].getStimSetting().getIntensity();
+    int rchrgIntensity1 = amplitudes.getChannelSettings()[0].getRchrgSetting().getIntensity();
+    int stimIntensity2 = amplitudes.getChannelSettings()[1].getStimSetting().getIntensity();
+    int rchrgIntensity2 = amplitudes.getChannelSettings()[1].getRchrgSetting().getIntensity();
+    
     switch(theEvent.getName()){
       
       case "SetAmplitude" :
@@ -149,36 +176,36 @@ void controlEvent(ControlEvent theEvent) throws InterruptedException {
       as.stopStim();
       break;
       
-      /*case "Amplitude Up" :
-      amplitudes.setStimSetting(1, stimSet1, intensity++);
-      amplitudes.setRchrgSetting(1, rchrgSet1, intensity++);
-      amplitudes.setStimSetting(2, stimSet2, intensity++);
-      amplitudes.setRchrgSetting(2, rchrgSet2, intensity++);
+      case "GetBatteryStatus" :
+      as.CheckBattery();
+      break;
+      
+      case "Amplitude Up" :
+      println("amplitude up");
+      stimIntensity1++;
+      rchrgIntensity1++;
+      stimIntensity2++;
+      rchrgIntensity2++;
+      amplitudes.setStimSetting(1, stimSet1, stimIntensity1);
+      amplitudes.setRchrgSetting(1, rchrgSet1, rchrgIntensity1);
+      amplitudes.setStimSetting(2, stimSet2, stimIntensity2);
+      amplitudes.setRchrgSetting(2, rchrgSet2, rchrgIntensity2);
+      textLabel.setText(str(stimIntensity1));
+      break;
       
       case "Amplitude Down" :
-      amplitudes.setStimSetting(1, stimSet1, intensity--);
-      amplitudes.setRchrgSetting(1, rchrgSet1, intensity--);
-      amplitudes.setStimSetting(2, stimSet2, intensity--);
-      amplitudes.setRchrgSetting(2, rchrgSet2, intensity--);
-      */
+      println("amplitude down");
+      stimIntensity1--;
+      rchrgIntensity1--;
+      stimIntensity2--;
+      rchrgIntensity2--;
+      amplitudes.setStimSetting(1, stimSet1, stimIntensity1);
+      amplitudes.setRchrgSetting(1, rchrgSet1, rchrgIntensity1);
+      amplitudes.setStimSetting(2, stimSet2, stimIntensity2);
+      amplitudes.setRchrgSetting(2, rchrgSet2, rchrgIntensity2);
+      textLabel.setText(str(stimIntensity1));
+      break;
     } 
   }
 }
-
-
-
-
-  
-  
-
-
-
-
-
-
-     
-     
-     
-
-
      
