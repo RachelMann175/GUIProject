@@ -1,4 +1,6 @@
-class TimingCommand {
+class TimingCommand {  
+  
+  private double duration;
   
   //a byte array to store the timing setting hexadecimal
   private byte[] timingOutput = new byte[11];
@@ -124,6 +126,15 @@ class TimingCommand {
       println("error: invalid integer for pulse period, please choose a value between 0 and 255");
       println(pulsePeriod);
     }
+  }
+  
+  public void setDuration(double duration){
+    this.duration = duration;
+    println("Successfully set duration to " + duration + " minutes");
+  }
+  
+  public double getDuration(){
+    return this.duration;
   }
 }
   

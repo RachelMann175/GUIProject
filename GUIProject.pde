@@ -33,85 +33,118 @@ void setup(){
   as = new AdvancedSettings();
   
   simpleSettingEvents= Arrays.asList("Amplitude: mA", "Frequency: Hz",
-                                   "Pulsewidth: us");
+                                   "Pulsewidth: us", "Duration: min");
   
   cp5.addTextfield("Amplitude: mA")
   .setPosition(20,50)
   .setSize(200,40)
-  .setAutoClear(false);
+  .setFont(font)
+  .setAutoClear(false)
+  .getCaptionLabel().setFont(font);
   
-  textLabel = cp5.addTextlabel("Current Amplitude")
+  cp5.addTextlabel("Current Amplitude")
   .setPosition(260,50)
   .setSize(200,40)
   .setStringValue("")
   .setFont(font);
   
-  cp5.addBang("Amplitude Up")
+  Label B1 = cp5.addBang("Amplitude Up")
   .setPosition(400,30)
   .setImage(loadImage("C://Users//Setup//Documents//GitHub//GUIProject//Small-up-arrow.png"))
   .updateSize()
   .getCaptionLabel().align(ControlP5.CENTER, ControlP5.CENTER);
   
-  cp5.addBang("Amplitude Down")
+  B1.setFont(font);
+  
+  Label B2 = cp5.addBang("Amplitude Down")
   .setPosition(580,30)
   .setImage(loadImage("C://Users//Setup//Documents//GitHub//GUIProject//Small-down-arrow.png"))
   .updateSize()
   .getCaptionLabel().align(ControlP5.CENTER, ControlP5.CENTER);
   
+  B2.setFont(font);
+  
   cp5.addTextfield("Frequency: Hz")
-  .setPosition(20,190)
+  .setPosition(20,150)
   .setSize(200,40)
-  .setAutoClear(false);
+  .setFont(font)
+  .setAutoClear(false)
+  .getCaptionLabel().setFont(font);
   
   cp5.addTextfield("Pulsewidth: us")
-  .setPosition(20,330)
+  .setPosition(20,250)
   .setSize(200,40)
-  .setAutoClear(false);
+  .setFont(font)
+  .setAutoClear(false)
+  .getCaptionLabel().setFont(font);
+  
+  cp5.addTextfield("Duration: min")
+  .setPosition(20,350)
+  .setSize(200,40)
+  .setFont(font)
+  .setAutoClear(false)
+  .getCaptionLabel().setFont(font);
   
   simpleButtons = Arrays.asList("StartStim", "StopStim", 
                                  "SetAmplitude", "SetTiming",
                                  "Amplitude Up", "Amplitude Down",
                                  "GetBatteryStatus");
   
-  cp5.addBang("StartStim")
-  .setPosition(20,610)
+  Label B3 = cp5.addBang("StartStim")
+  .setPosition(20,550)
   .setSize(200,40)
   .getCaptionLabel().align(ControlP5.CENTER, ControlP5.CENTER);
   
-  cp5.addBang("StopStim")
-  .setPosition(260,610)
+  B3.setFont(font);
+  
+  Label B4 = cp5.addBang("StopStim")
+  .setPosition(260,550)
   .setSize(200,40)
   .getCaptionLabel().align(ControlP5.CENTER, ControlP5.CENTER);
   
-  cp5.addBang("SetAmplitude")
-  .setPosition(20,470)
+  B4.setFont(font);
+  
+  Label B5 = cp5.addBang("SetAmplitude")
+  .setPosition(20,450)
   .setSize(200,40)
   .getCaptionLabel().align(ControlP5.CENTER, ControlP5.CENTER);
   
-  cp5.addBang("SetTiming")
-  .setPosition(260,470)
+  B5.setFont(font);
+  
+  Label B6 = cp5.addBang("SetTiming")
+  .setPosition(260,450)
   .setSize(200,40)
   .getCaptionLabel().align(ControlP5.CENTER, ControlP5.CENTER);
   
-  cp5.addBang("OpenAdvancedSettings")
-  .setPosition(20,890)
+  B6.setFont(font);
+  
+  Label B7 = cp5.addBang("OpenAdvancedSettings")
+  .setPosition(20,750)
   .setSize(400,40)
   .getCaptionLabel().align(ControlP5.CENTER, ControlP5.CENTER);
   
-  cp5.addBang("Get History")
-  .setPosition(20,750)
+  B7.setFont(font);
+  
+  Label B8 = cp5.addBang("Get History")
+  .setPosition(20,650)
   .setSize(200,40)
   .getCaptionLabel().align(ControlP5.CENTER, ControlP5.CENTER);
   
-  cp5.addBang("Clear History")
-  .setPosition(250,750)
+  B8.setFont(font);
+  
+  Label B9 = cp5.addBang("Clear History")
+  .setPosition(250,650)
   .setSize(200,40)
   .getCaptionLabel().align(ControlP5.CENTER, ControlP5.CENTER);
   
-  cp5.addBang("GetBatteryStatus")
-  .setPosition(480,750)
+  B9.setFont(font);
+  
+  Label B10 = cp5.addBang("BatteryStatus")
+  .setPosition(480,650)
   .setSize(200,40)
   .getCaptionLabel().align(ControlP5.CENTER, ControlP5.CENTER);
+  
+  B10.setFont(font);
   
 }
 
@@ -149,6 +182,10 @@ void controlEvent(ControlEvent theEvent) throws InterruptedException {
       tc.setRechargePulseWidth(intensity);
       break;
       
+      case "Duration: min" :
+      tc.setDuration(intensity);
+      break;
+      
     }
   }
   if(simpleButtons.contains(theEvent.getName())){
@@ -179,7 +216,7 @@ void controlEvent(ControlEvent theEvent) throws InterruptedException {
       case "GetBatteryStatus" :
       as.CheckBattery();
       break;
-      
+
       case "Amplitude Up" :
       println("amplitude up");
       stimIntensity1++;
